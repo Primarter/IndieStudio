@@ -1,0 +1,12 @@
+*.tmp*
+*.test*
+a.out
+bomberman
+bomberman.exe
+bomberman.ilk
+bomberman.pdb
+build_tools/build/*
+.vscode
+out
+.vs
+build
