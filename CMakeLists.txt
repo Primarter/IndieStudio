@@ -36,13 +36,38 @@ set(SRC_FILES
     ${PROJECT_ROOT}/ECS/systems/EndGameSystem.cpp
     ${PROJECT_ROOT}/ECS/systems/AISystem.cpp
 )
+
+if(POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
+    set(CMAKE_POLICY_DEFAULT_CMP0135 NEW)
+endif()
+
+set(RAYLIB_VERSION 5.0)
+find_package(raylib ${RAYLIB_VERSION} QUIET) # QUIET or REQUIRED
+if (NOT raylib_FOUND) # If there's none, fetch and build raylib
+  include(FetchContent)
+  FetchContent_Declare(
+    raylib
+    DOWNLOAD_EXTRACT_TIMESTAMP OFF
+    URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.tar.gz
+  )
+  FetchContent_GetProperties(raylib)
+  if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
+    set(FETCHCONTENT_QUIET NO)
+    FetchContent_Populate(raylib)
+    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
+    add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+  endif()
+endif()
+
 add_executable(bomberman ${SRC_FILES})
 target_include_directories(bomberman PRIVATE ${PROJECT_ROOT}/include/)
+target_link_libraries(bomberman raylib)
 
 if (MSVC)
-    target_compile_options(bomberman PRIVATE "/ZM" "/Wall" "/std:c++17" "/fno-inline" "/fno-omit-frame-pointer")
+    target_compile_options(bomberman PRIVATE "/ZM" "/Wall" "/std:c++17" "/gdwarf-2" "/g3" "/ggdb")
     set_target_properties(bomberman PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "../.."
+        RUNTIME_OUTPUT_DIRECTORY "../../"
     )
 else()
     target_compile_options(bomberman PRIVATE -W -Wall -Wextra -Wno-missing-field-initializers -g3)
@@ -50,23 +75,17 @@ else()
         RUNTIME_OUTPUT_DIRECTORY "../"
     )
 endif()
-# target_link_libraries(bomberman PRIVATE -ldl)
 
-if(POLICY CMP0135)
-    cmake_policy(SET CMP0135 NEW)
-    set(CMAKE_POLICY_DEFAULT_CMP0135 NEW)
-endif()
-
-TARGET_LINK_LIBRARIES(bomberman raylib)
-if (NOT raylib_FOUND)
-    INCLUDE(FetchContent)
-    FetchContent_Declare(raylib URL https://github.com/raysan5/raylib/archive/master.tar.gz)
-    FetchContent_GetProperties(raylib)
-    if (NOT raylib_POPULATED)
-        SET(FETCHCONTENT_QUIET NO)
-        FetchContent_Populate(raylib)
-        SET(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-        ADD_SUBDIRECTORY(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
-        SET(raylib_FOUND TRUE)
-    endif()
-endif()
+# TARGET_LINK_LIBRARIES(bomberman raylib)
+# if (NOT raylib_FOUND)
+#     INCLUDE(FetchContent)
+#     FetchContent_Declare(raylib URL https://github.com/raysan5/raylib/archive/master.tar.gz)
+#     FetchContent_GetProperties(raylib)
+#     if (NOT raylib_POPULATED)
+#         SET(FETCHCONTENT_QUIET NO)
+#         FetchContent_Populate(raylib)
+#         SET(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+#         ADD_SUBDIRECTORY(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+#         SET(raylib_FOUND TRUE)
+#     endif()
+# endif()

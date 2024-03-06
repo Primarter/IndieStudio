@@ -41,13 +41,13 @@
 Camera3D setupCamera(void)
 {
     Camera3D camera = {
-        { 7.0f, 20.0f, 7.0f },
+        .position={ 7.0f, 20.0f, 7.0f },
         // .position={ 7.0f, 18.0f, 15.0f },
-        { 7.0f, 0.0f, 7.0f },
+        .target={ 7.0f, 0.0f, 7.0f },
 
-        { 0.0f, 1.0f, 0.0f },
-        45.0f,
-        CAMERA_PERSPECTIVE
+        .up={ 0.0f, 1.0f, 0.0f },
+        .fovy=45.0f,
+        .projection=CAMERA_PERSPECTIVE
     };
 
     return camera;
